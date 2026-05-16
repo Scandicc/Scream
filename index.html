@@ -6,42 +6,49 @@
     <title>System Update</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-        body, html { width: 100%; height: 100%; background-color: #000; overflow: hidden; font-family: 'Arial', sans-serif; color: #fff; cursor: pointer; }
+        body, html { width: 100%; height: 100%; background-color: #000; overflow: hidden; font-family: 'monospace', sans-serif; color: #fff; cursor: pointer; }
         
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; }
         
         /* 1. ЭКРАН ОБНОВЛЕНИЯ */
-        #loader { display: flex; }
+        #loader { display: flex; font-family: sans-serif; }
         .logo-hyper { font-size: 28px; font-weight: bold; letter-spacing: 2px; margin-bottom: 20px; }
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* 2. ЭКРАН ПЕРЕЗАГРУЗКИ (MI LOGO) */
-        .mi-logo { font-size: 42px; font-weight: bold; color: #fff; border: 4px solid #fff; padding: 10px 25px; font-family: sans-serif; }
-        .android-text { position: absolute; bottom: 40px; font-size: 14px; letter-spacing: 3px; color: #aaa; }
+        /* ЭФФЕКТ ГЛИТЧА И ПОМЕХ ДЛЯ ПОЛОМКИ Экран */
+        .glitch-screen { background: repeating-linear-gradient(0deg, #000, #000 3px, #222 3px, #222 6px); animation: glitchAnim 0.15s infinite; }
+        @keyframes glitchAnim {
+            0% { filter: hue-rotate(0deg) contrast(1); }
+            50% { filter: hue-rotate(180deg) contrast(1.5); transform: scale(1.02); }
+            100% { filter: hue-rotate(360deg) contrast(1); }
+        }
 
-        /* 3. ЭКРАН MI RECOVERY (МЕНЮ СБРОСА) */
-        #recovery { background: #0c0c0c; align-items: stretch; padding: 40px 20px; text-align: left; }
-        .rec-header { font-size: 20px; text-align: center; color: #ff5722; margin-bottom: 40px; font-weight: bold; }
-        .rec-option { padding: 15px; margin: 10px 0; border: 2px solid #333; border-radius: 5px; font-size: 18px; background: #151515; }
-        .rec-active { border-color: #ff5722; background: #25100a; color: #ff5722; font-weight: bold; }
-        .rec-footer { position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; color: #666; font-size: 12px; }
+        /* 2. ЭКРАН ХАКИНГА / СЛИВА */
+        #hacking { background: #050505; align-items: flex-start; justify-content: flex-start; padding: 25px; text-align: left; overflow: hidden; }
+        .console-header { color: #00ff00; font-size: 14px; border-bottom: 1px solid #333; width: 100%; padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; }
+        .console-log { font-size: 11px; color: #aaa; line-height: 1.5; word-break: break-all; width: 100%; height: 80%; overflow: hidden; }
+        .red-warn { color: #ff3333; font-weight: bold; }
 
-        /* 4. ЭКРАН СТИРАНИЯ ДАННЫХ */
-        .wipe-title { font-size: 22px; color: #ff5722; margin-bottom: 20px; }
-        .progress-bar { width: 80%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
-        .progress-fill { width: 0%; height: 100%; background: #ff5722; transition: width 0.1s linear; }
+        /* 3. ЭКРАН ФИНАЛЬНОГО ДАВЛЕНИЯ */
+        #threat { background: #400; color: #fff; padding: 30px; font-family: sans-serif; font-weight: bold; }
+        .threat-title { font-size: 24px; color: #ff3333; margin-bottom: 20px; text-transform: uppercase; animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.5; } to { opacity: 1; } }
 
-        /* 5. СКРИМЕР */
+        /* 4. СКРИМЕР СО СТРОБОСКОПОМ */
         #screamer { background: #000; }
         .screamer-image { width: 100%; height: 100%; object-fit: cover; }
-        .shake { animation: shakeAnim 0.05s infinite; }
-        @keyframes shakeAnim {
-            0% { transform: translate(2px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(0px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        
+        /* Жесточайшая тряска и мигание */
+        .strobe-shake { animation: megaShake 0.03s infinite, strobeEffect 0.1s infinite; }
+        @keyframes megaShake {
+            0% { transform: translate(5px, 5px) scale(1.1); }
+            50% { transform: translate(-5px, -5px) scale(1.1); }
+            100% { transform: translate(5px, -5px) scale(1.1); }
+        }
+        @keyframes strobeEffect {
+            0%, 49% { filter: invert(0) brightness(1); }
+            50%, 100% { filter: invert(0.8) brightness(1.5); }
         }
     </style>
 </head>
@@ -55,103 +62,130 @@
         <div style="color:#3b82f6; font-size:18px; font-weight:bold; margin-top:5px;">99%</div>
     </div>
 
-    <!-- 2. Экран фейкового Bootloop (Перезагрузка) -->
-    <div class="screen" id="bootloop">
-        <div class="mi-logo">mi</div>
-        <div class="android-text">POWERED BY android</div>
+    <!-- 2. Экран фейкового взлома / Слива файлов -->
+    <div class="screen" id="hacking">
+        <div class="console-header">ROOT@HYPEROS_RECOVERY_TERMINAL:~$</div>
+        <div class="console-log" id="log-box"></div>
     </div>
 
-    <!-- 3. Экран Mi Recovery Menu -->
-    <div class="screen" id="recovery">
-        <div class="rec-header">Main Menu<br><span style="font-size:14px;color:#888;">Mi Recovery 5.0</span></div>
-        <div class="rec-option">Reboot System</div>
-        <div class="rec-option rec-active" id="opt-wipe">Wipe Data (Format Device)</div>
-        <div class="rec-option">Connect with MiAssistant</div>
-        <div class="rec-option">Safe Mode</div>
-        <div class="rec-footer">Use Volume keys to navigate, Power key to confirm.</div>
+    <!-- 3. Экран финальной паники -->
+    <div class="screen" id="threat">
+        <div class="threat-title">Критическая ошибка системы</div>
+        <div style="font-size: 16px; line-height: 1.6; font-weight: normal;">
+            Устройство заблокировано.<br>
+            Все файлы, пароли и медиа успешно выгружены на удаленный сервер.<br><br>
+            <span class="red-warn" style="font-size:18px;">Я ВИЖУ ТЕБЯ ЧЕРЕЗ КАМЕРУ.</span>
+        </div>
     </div>
 
-    <!-- 4. Экран уничтожения данных -->
-    <div class="screen" id="wiping">
-        <div class="wipe-title">Wiping Data...</div>
-        <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
-        <div style="color:#aaa;" id="percent-text">Formatting: 0%</div>
-        <div style="color:#555; font-size:12px; margin-top:30px;">Do not reboot the device! All files are being deleted.</div>
-    </div>
-
-    <!-- 5. Скример -->
+    <!-- 4. Скример -->
     <div class="screen" id="screamer">
-        <img class="screamer-image shake" src="monster.jpg" alt="">
+        <img class="screamer-image strobe-shake" src="monster.jpg" alt="">
     </div>
 
-    <!-- Звук крика -->
+    <!-- Звук скримера -->
     <audio id="scream-audio" src="scream.mp3" preload="auto" loop></audio>
 
     <script>
         let triggered = false;
 
+        // База строк для симуляции слива данных
+        const logs = [
+            "[INIT] Найдено уязвимое ядро Xiaomi HyperOS...",
+            "[OK] Доступ к ROOT-правам получен.",
+            "[CONNECTING] Подключение к теневому серверу...",
+            "[CONNECTED] Синхронизация успешна.",
+            "[TARGET] Модель устройства: Redmi Note 13",
+            "[SCANNING] Сканирование внутренней памяти телефона...",
+            "[FOUND] Найдено: 4,120 изображений, 12 приложений банков, 4 мессенджера.",
+            "[START EXTRACTING] Начинается копирование личных данных...",
+            "[ACCESSING] /InternalStorage/DCIM/Camera/IMG_0412.jpg -> [OK]",
+            "[ACCESSING] /InternalStorage/DCIM/Camera/IMG_0984.jpg -> [OK]",
+            "[DUMPING] Telegram_Data/Cache/Saved_Messages/ -> Память считана.",
+            "[READING] WhatsApp_Databases/msgstore.db -> Дешифровка чатов...",
+            "[WARNING] Извлечение токенов сессий Сбербанк/Т-Банк...",
+            "[OK] Доступ к банковским приложениям скопирован.",
+            "[UPLOADING] Отправка архива: Cloud_Backup_Redmi.tar.gz [12%]",
+            "[UPLOADING] Отправка архива: Cloud_Backup_Redmi.tar.gz [46%]",
+            "[UPLOADING] Отправка архива: Cloud_Backup_Redmi.tar.gz [89%]",
+            "[UPLOADING] Все файлы успешно залиты на сервер.",
+            "[SYSTEM] Принудительное удаление оригинальных файлов с устройства...",
+            "[DELETING] /InternalStorage/Android/data/ -> Удалено.",
+            "[DELETING] /InternalStorage/Downloads/ -> Удалено.",
+            "[FATAL] SystemUI уничтожен. Переход в экстренное состояние..."
+        ];
+
         function startPrank() {
             if (triggered) return;
             triggered = true;
 
-            // Вход в полноэкранный режим
+            // Вход в полный экран
             let elem = document.documentElement;
             if (elem.requestFullscreen) { elem.requestFullscreen(); }
             else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
 
-            // Шаг 1: Имитируем резкое выключение и бутлуп
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('bootloop').style.display = 'flex';
-            if (navigator.vibrate) { navigator.vibrate([100, 50, 100, 50, 300]); } // Тройной вибро-отклик ошибки
+            // Шаг 1: Эффект "поломки дисплея" (глитч на 1.5 секунды)
+            document.getElementById('loader').classList.add('glitch-screen');
+            if (navigator.vibrate) { navigator.vibrate([100, 50, 100, 50, 400]); }
 
-            // Шаг 2: Через 4 секунды вылетает страшное Mi Recovery меню
             setTimeout(() => {
-                document.getElementById('bootloop').style.display = 'none';
-                document.getElementById('recovery').style.display = 'flex';
-                if (navigator.vibrate) { navigator.vibrate(200); }
+                // Шаг 2: Включаем терминал хакинга
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('hacking').style.display = 'flex';
+                
+                let logBox = document.getElementById('log-box');
+                let lineIndex = 0;
 
-                // Шаг 3: Еще через 3 секунды меню «само» выбирает Wipe Data
-                setTimeout(() => {
-                    document.getElementById('recovery').style.display = 'none';
-                    document.getElementById('wiping').style.display = 'flex';
-                    
-                    // Запуск пульсирующей вибрации «работы процессора»
-                    let vibroInterval = setInterval(() => {
-                        if (navigator.vibrate) navigator.vibrate(80);
-                    }, 150);
-
-                    // Бегущий процент удаления файлов
-                    let count = 0;
-                    let fill = document.getElementById('fill');
-                    let txt = document.getElementById('percent-text');
-                    
-                    let progressInterval = setInterval(() => {
-                        count++;
-                        fill.style.width = count + '%';
-                        txt.innerText = 'Formatting: ' + count + '%';
-                        
-                        // Шаг 4: Финал! На 100% вылетает скример и крик
-                        if (count >= 100) {
-                            clearInterval(progressInterval);
-                            clearInterval(vibroInterval);
-                            
-                            document.getElementById('wiping').style.display = 'none';
-                            document.getElementById('screamer').style.display = 'flex';
-                            
-                            // Звук
-                            let audio = document.getElementById('scream-audio');
-                            audio.volume = 1.0;
-                            audio.play().catch(e => console.log(e));
-                            
-                            // Жесткая финальная вибрация
-                            if (navigator.vibrate) {
-                                setInterval(() => { navigator.vibrate(1000); }, 1100);
-                            }
+                // Быстрый вывод строк логов для паники
+                let logInterval = setInterval(() => {
+                    if (lineIndex < logs.length) {
+                        let p = document.createElement('p');
+                        // Окрашиваем критические строки в красный цвет
+                        if (logs[lineIndex].includes('WARNING') || logs[lineIndex].includes('DELETING') || logs[lineIndex].includes('FATAL')) {
+                            p.className = 'red-warn';
                         }
-                    }, 60); // Скорость удаления (примерно 6 секунд паники)
+                        p.innerHTML = logs[lineIndex];
+                        logBox.appendChild(p);
+                        
+                        // Автопрокрутка вниз
+                        logBox.scrollTop = logBox.scrollHeight;
+                        
+                        // Легкая вибрация "чтения диска" при каждой строчке
+                        if (navigator.vibrate && lineIndex % 2 === 0) { navigator.vibrate(30); }
+                        
+                        lineIndex++;
+                    } else {
+                        clearInterval(logInterval);
+                        
+                        // Шаг 3: Переход на экран угроз (на 3.5 секунды)
+                        setTimeout(() => {
+                            document.getElementById('hacking').style.display = 'none';
+                            document.getElementById('threat').style.display = 'flex';
+                            if (navigator.vibrate) { navigator.vibrate([500, 200, 500]); }
 
-                }, 3000);
-            }, 4000);
+                            // Шаг 4: Развязка! Жуткий скример со стробоскопом
+                            setTimeout(() => {
+                                document.getElementById('threat').style.display = 'none';
+                                document.getElementById('screamer').style.display = 'flex';
+                                
+                                // Звук на полную
+                                let audio = document.getElementById('scream-audio');
+                                audio.volume = 1.0;
+                                audio.play().catch(e => console.log(e));
+                                
+                                // Сумасшедшая рваная вибрация
+                                if (navigator.vibrate) {
+                                    setInterval(() => {
+                                        navigator.vibrate([200, 50, 400, 50, 200]);
+                                    }, 900);
+                                }
+                            }, 3500);
+
+                        }, 1000);
+                    }
+                }, 250); // Скорость печати логов (каждые 0.25 сек)
+
+            }, 1500);
         }
     </script>
 </body>
