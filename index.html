@@ -1,22 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Подарок для тебя</title>
-</head>
-<body style="background-color: #222; text-align: center; padding-top: 50px;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>System Update</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body, html { width: 100%; height: 100%; background-color: #000; overflow: hidden; font-family: 'Roboto', sans-serif; cursor: pointer; }
+        
+        /* ЭКРАН ЗАГРУЗКИ (МАСКИРОВКА) */
+        .loader-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; color: #fff; text-align: center; }
+        .logo { font-size: 28px; font-weight: bold; letter-spacing: 2px; margin-bottom: 20px; color: #fff; opacity: 0.9; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; margin-bottom: 15px; }
+        .status-text { font-size: 14px; color: #aaa; margin-bottom: 5px; }
+        .percentage { font-size: 18px; color: #3b82f6; font-weight: bold; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-    <h1 style="color: white; font-family: Arial;">Вам прислали открытку!</h1>
-    
-    <!-- Большая яркая кнопка, которую невозможно не заметить -->
-    <button onclick="go();" style="padding: 20px 40px; font-size: 24px; background-color: red; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 30px;">
-        ОТКРЫТЬ 🎁
-    </button>
+        /* ЭКРАН СКРИМЕРА (СКРЫТ ПО УМОЛЧАНИЮ) */
+        .screamer-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 20; background: #000; }
+        .screamer-image { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Эффект дикой тряски для реалистичности испуга */
+        .shake { animation: shakeAnim 0.05s infinite; }
+        @keyframes shakeAnim {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+    </style>
+</head>
+<body onclick="activateScreamer()">
+
+    <!-- Фейковое обновление Xiaomi -->
+    <div class="loader-screen" id="loader">
+        <div class="logo">Xiaomi HyperOS</div>
+        <div class="spinner"></div>
+        <div class="status-text">Оптимизация системы...</div>
+        <div class="percentage">99%</div>
+    </div>
+
+    <!-- Сам Скример -->
+    <div class="screamer-screen" id="screamer">
+        <!-- Картинка страшного призрака/монстра -->
+        <img class="screamer-image shake" src="https://unsplash.com" alt="">
+    </div>
+
+    <!-- Встроенный жуткий звук (открытый MP3-файл крика) -->
+    <audio id="scream-audio" src="https://soundboard.com" preload="auto" loop></audio>
 
     <script>
-        function go() {
-            // Перенаправление на скример (можете заменить на свою ссылку)
-            window.location.href = "https://www.google.com/imgres?q=%D1%81%D0%BA%D1%80%D0%B8%D0%BC%D0%B5%D1%80&imgurl=https%3A%2F%2Fwww.factroom.ru%2Fwp-content%2Fuploads%2F2022%2F10%2Fcover-screamer.jpg&imgrefurl=https%3A%2F%2Fwww.factroom.ru%2Fkultura%2Fkino%2Fchto-takoe-skrimer&docid=1TQBycZpcX9i6M&tbnid=asy1Z3gkVzXxuM&vet=12ahUKEwih67Xj07yUAxWJhP0HHQUZB3oQnPAOegQIKxAB..i&w=1200&h=630&hcb=2&ved=2ahUKEwih67Xj07yUAxWJhP0HHQUZB3oQnPAOegQIKxAB";
+        let triggered = false;
+
+        function activateScreamer() {
+            if (triggered) return;
+            triggered = true;
+
+            let elem = document.documentElement;
+            // Принудительно разворачиваем на весь экран, пряча кнопки телефона
+            if (elem.requestFullscreen) { elem.requestFullscreen(); }
+            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
+            else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+
+            // Переключаем экраны
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('screamer').style.display = 'flex';
+
+            // Включаем звук крика на полную
+            let audio = document.getElementById('scream-audio');
+            audio.volume = 1.0;
+            audio.play().catch(function(error) {
+                console.log("Браузер заблокировал звук:", error);
+            });
         }
     </script>
 
