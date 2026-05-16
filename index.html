@@ -1,40 +1,22 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вам пришло сообщение</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #111; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .btn { padding: 15px 30px; font-size: 18px; color: white; background: #007bff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(0,123,255,0.4); }
-    </style>
+    <title>Подарок для тебя</title>
 </head>
-<body>
+<body style="background-color: #222; text-align: center; padding-top: 50px;">
 
-    <!-- Кнопка-приманка (Android требует клика пользователя, чтобы включить звук и полноэкранный режим) -->
-    <button class="btn" onclick="startPrank()">Посмотреть подарок 🎁</button>
+    <h1 style="color: white; font-family: Arial;">Вам прислали открытку!</h1>
+    
+    <!-- Большая яркая кнопка, которую невозможно не заметить -->
+    <button onclick="go();" style="padding: 20px 40px; font-size: 24px; background-color: red; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 30px;">
+        ОТКРЫТЬ 🎁
+    </button>
 
     <script>
-        function startPrank() {
-            let elem = document.documentElement;
-            
-            // Разворачиваем на весь экран смартфона (скрываем адресную строку)
-            if (elem.requestFullscreen) { elem.requestFullscreen(); }
-            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
-
-            // Искусственно создаем кратковременный звук, чтобы браузер разрешил аудио-поток на следующем сайте
-            let context = new (window.AudioContext || window.webkitAudioContext)();
-            let osc = context.createOscillator();
-            osc.connect(context.destination);
-            osc.start(0);
-            osc.stop(0.1);
-
-            // Задержка 0.3 секунды для применения эффектов и мгновенный редирект на скример
-            setTimeout(() => {
-                // Вставьте ссылку на любой сайт-скример вместо указанного ниже
-                window.location.href = "https://frightfind.com"; 
-            }, 300);
+        function go() {
+            // Перенаправление на скример (можете заменить на свою ссылку)
+            window.location.href = "https://frightfind.com";
         }
     </script>
 
