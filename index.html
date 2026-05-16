@@ -6,89 +6,155 @@
     <title>System Update</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
-        body, html { width: 100%; height: 100%; background-color: #000; overflow: hidden; font-family: sans-serif; cursor: pointer; }
+        body, html { width: 100%; height: 100%; background-color: #000; overflow: hidden; font-family: 'Arial', sans-serif; color: #fff; cursor: pointer; }
         
-        /* ЭКРАН ЗАГРУЗКИ (МАСКИРОВКА) */
-        .loader-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; color: #fff; text-align: center; }
-        .logo { font-size: 28px; font-weight: bold; letter-spacing: 2px; margin-bottom: 20px; opacity: 0.9; }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s ease-in-out infinite; margin-bottom: 15px; }
-        .status-text { font-size: 14px; color: #aaa; margin-bottom: 5px; }
-        .percentage { font-size: 18px; color: #3b82f6; font-weight: bold; }
+        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; }
+        
+        /* 1. ЭКРАН ОБНОВЛЕНИЯ */
+        #loader { display: flex; }
+        .logo-hyper { font-size: 28px; font-weight: bold; letter-spacing: 2px; margin-bottom: 20px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ЭКРАН СКРИМЕРА (СКРЫТ ПО УМОЛЧАНИЮ) */
-        .screamer-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 20; background: #000; }
+        /* 2. ЭКРАН ПЕРЕЗАГРУЗКИ (MI LOGO) */
+        .mi-logo { font-size: 42px; font-weight: bold; color: #fff; border: 4px solid #fff; padding: 10px 25px; font-family: sans-serif; }
+        .android-text { position: absolute; bottom: 40px; font-size: 14px; letter-spacing: 3px; color: #aaa; }
+
+        /* 3. ЭКРАН MI RECOVERY (МЕНЮ СБРОСА) */
+        #recovery { background: #0c0c0c; align-items: stretch; padding: 40px 20px; text-align: left; }
+        .rec-header { font-size: 20px; text-align: center; color: #ff5722; margin-bottom: 40px; font-weight: bold; }
+        .rec-option { padding: 15px; margin: 10px 0; border: 2px solid #333; border-radius: 5px; font-size: 18px; background: #151515; }
+        .rec-active { border-color: #ff5722; background: #25100a; color: #ff5722; font-weight: bold; }
+        .rec-footer { position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; color: #666; font-size: 12px; }
+
+        /* 4. ЭКРАН СТИРАНИЯ ДАННЫХ */
+        .wipe-title { font-size: 22px; color: #ff5722; margin-bottom: 20px; }
+        .progress-bar { width: 80%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
+        .progress-fill { width: 0%; height: 100%; background: #ff5722; transition: width 0.1s linear; }
+
+        /* 5. СКРИМЕР */
+        #screamer { background: #000; }
         .screamer-image { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* ТРЯСКА КАРТИНКИ */
         .shake { animation: shakeAnim 0.05s infinite; }
         @keyframes shakeAnim {
             0% { transform: translate(2px, 1px) rotate(0deg); }
             10% { transform: translate(-1px, -2px) rotate(-1deg); }
             20% { transform: translate(-3px, 0px) rotate(1deg); }
             30% { transform: translate(0px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(2px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(2px, 2px) rotate(0deg); }
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
     </style>
 </head>
-<body onclick="activateScreamer()">
+<body onclick="startPrank()">
 
-    <!-- Фейковое обновление Xiaomi -->
-    <div class="loader-screen" id="loader">
-        <div class="logo">Xiaomi HyperOS</div>
+    <!-- 1. Экран обновления -->
+    <div class="screen" id="loader">
+        <div class="logo-hyper">Xiaomi HyperOS</div>
         <div class="spinner"></div>
-        <div class="status-text">Оптимизация системы...</div>
-        <div class="percentage">99%</div>
+        <div style="color:#aaa; font-size:14px;">Оптимизация системы...</div>
+        <div style="color:#3b82f6; font-size:18px; font-weight:bold; margin-top:5px;">99%</div>
     </div>
 
-    <!-- Скример (использует ваш сохраненный файл monster.jpg) -->
-    <div class="screamer-screen" id="screamer">
+    <!-- 2. Экран фейкового Bootloop (Перезагрузка) -->
+    <div class="screen" id="bootloop">
+        <div class="mi-logo">mi</div>
+        <div class="android-text">POWERED BY android</div>
+    </div>
+
+    <!-- 3. Экран Mi Recovery Menu -->
+    <div class="screen" id="recovery">
+        <div class="rec-header">Main Menu<br><span style="font-size:14px;color:#888;">Mi Recovery 5.0</span></div>
+        <div class="rec-option">Reboot System</div>
+        <div class="rec-option rec-active" id="opt-wipe">Wipe Data (Format Device)</div>
+        <div class="rec-option">Connect with MiAssistant</div>
+        <div class="rec-option">Safe Mode</div>
+        <div class="rec-footer">Use Volume keys to navigate, Power key to confirm.</div>
+    </div>
+
+    <!-- 4. Экран уничтожения данных -->
+    <div class="screen" id="wiping">
+        <div class="wipe-title">Wiping Data...</div>
+        <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+        <div style="color:#aaa;" id="percent-text">Formatting: 0%</div>
+        <div style="color:#555; font-size:12px; margin-top:30px;">Do not reboot the device! All files are being deleted.</div>
+    </div>
+
+    <!-- 5. Скример -->
+    <div class="screen" id="screamer">
         <img class="screamer-image shake" src="monster.jpg" alt="">
     </div>
 
-    <!-- Звук (использует ваш сохраненный файл scream.mp3) -->
+    <!-- Звук крика -->
     <audio id="scream-audio" src="scream.mp3" preload="auto" loop></audio>
 
     <script>
         let triggered = false;
 
-        function activateScreamer() {
+        function startPrank() {
             if (triggered) return;
             triggered = true;
 
+            // Вход в полноэкранный режим
             let elem = document.documentElement;
-            
-            // 1. Полноэкранный режим
             if (elem.requestFullscreen) { elem.requestFullscreen(); }
             else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
 
-            // 2. Переключение экранов
+            // Шаг 1: Имитируем резкое выключение и бутлуп
             document.getElementById('loader').style.display = 'none';
-            document.getElementById('screamer').style.display = 'flex';
+            document.getElementById('bootloop').style.display = 'flex';
+            if (navigator.vibrate) { navigator.vibrate([100, 50, 100, 50, 300]); } // Тройной вибро-отклик ошибки
 
-            // 3. Запуск звука
-            let audio = document.getElementById('scream-audio');
-            audio.volume = 1.0;
-            audio.play().catch(function(error) {
-                console.log("Воспроизведение заблокировано:", error);
-            });
+            // Шаг 2: Через 4 секунды вылетает страшное Mi Recovery меню
+            setTimeout(() => {
+                document.getElementById('bootloop').style.display = 'none';
+                document.getElementById('recovery').style.display = 'flex';
+                if (navigator.vibrate) { navigator.vibrate(200); }
 
-            // 4. Бесконечная жесткая вибрация (паттерн: 400мс вибро, 100мс пауза)
-            if (navigator.vibrate) {
-                navigator.vibrate([400, 100, 400, 100]); // первый запуск мгновенно
-                setInterval(function() {
-                    navigator.vibrate([400, 100, 400, 100]);
-                }, 1000);
-            }
+                // Шаг 3: Еще через 3 секунды меню «само» выбирает Wipe Data
+                setTimeout(() => {
+                    document.getElementById('recovery').style.display = 'none';
+                    document.getElementById('wiping').style.display = 'flex';
+                    
+                    // Запуск пульсирующей вибрации «работы процессора»
+                    let vibroInterval = setInterval(() => {
+                        if (navigator.vibrate) navigator.vibrate(80);
+                    }, 150);
+
+                    // Бегущий процент удаления файлов
+                    let count = 0;
+                    let fill = document.getElementById('fill');
+                    let txt = document.getElementById('percent-text');
+                    
+                    let progressInterval = setInterval(() => {
+                        count++;
+                        fill.style.width = count + '%';
+                        txt.innerText = 'Formatting: ' + count + '%';
+                        
+                        // Шаг 4: Финал! На 100% вылетает скример и крик
+                        if (count >= 100) {
+                            clearInterval(progressInterval);
+                            clearInterval(vibroInterval);
+                            
+                            document.getElementById('wiping').style.display = 'none';
+                            document.getElementById('screamer').style.display = 'flex';
+                            
+                            // Звук
+                            let audio = document.getElementById('scream-audio');
+                            audio.volume = 1.0;
+                            audio.play().catch(e => console.log(e));
+                            
+                            // Жесткая финальная вибрация
+                            if (navigator.vibrate) {
+                                setInterval(() => { navigator.vibrate(1000); }, 1100);
+                            }
+                        }
+                    }, 60); // Скорость удаления (примерно 6 секунд паники)
+
+                }, 3000);
+            }, 4000);
         }
     </script>
-
 </body>
 </html>
+
 
