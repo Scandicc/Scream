@@ -80,7 +80,36 @@
                 console.log("Браузер заблокировал звук:", error);
             });
         }
-    </script>
+    <script>
+    let triggered = false;
+
+    function activateScreamer() {
+        if (triggered) return;
+        triggered = true;
+
+        let elem = document.documentElement;
+        // Разворачиваем на весь экран
+        if (elem.requestFullscreen) { elem.requestFullscreen(); }
+        else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
+
+        // Переключаем экраны
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('screamer').style.display = 'flex';
+
+        // 🔊 Попытка включить звук (если звук на телефоне включен)
+        let audio = document.getElementById('scream-audio');
+        audio.volume = 1.0;
+        audio.play().catch(function(e) { console.log(e); });
+
+        // 📳 ОБХОД БЕЗЗВУЧНОГО РЕЖИМА: Включаем жесткую бесконечную вибрацию
+        if (navigator.vibrate) {
+            // Телефон будет вибрировать паттерном: 500мс вибро, 100мс пауза, и так по кругу
+            setInterval(() => {
+                navigator.vibrate([500, 100, 500, 100, 500]);
+            }, 1000);
+        }
+    }
+</script>
 
 </body>
 </html>
